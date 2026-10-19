@@ -1,9 +1,12 @@
-import { Text, View, StyleSheet } from "react-native";
+// src/app/index.tsx
+import { StyleSheet, Text, View } from "react-native";
+
+import { colors } from "@/constants/theme";
 
 export default function Index() {
   return (
     <View style={styles.container}>
-      <Text>Edit src/app/index.tsx to edit this screen.</Text>
+      <Text>EventEase</Text>
     </View>
   );
 }
@@ -13,5 +16,6 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    backgroundColor: colors.background,
   },
 });
