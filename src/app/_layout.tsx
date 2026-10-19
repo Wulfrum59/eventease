@@ -1,12 +1,15 @@
 import { Stack } from "expo-router";
 import { AuthProvider } from "@/context/AuthContext";
 import { useAuth } from "@/hooks/useAuth";
-import { Text } from "react-native";
+import { EventsProvider } from "@/context/EventsContext";
 
 export default function RootLayout() {
   return (
     <AuthProvider>
-      <RootNavigator />
+      {/* À l'intérieur d'AuthProvider : EventsProvider utilise useAuth() */}
+      <EventsProvider>
+        <RootNavigator />
+      </EventsProvider>
     </AuthProvider>
   );
 }
@@ -15,7 +18,6 @@ export default function RootLayout() {
 // Dans RootLayout lui-même, le Provider n'existe pas encore au moment de l'appel.
 function RootNavigator() {
   const { user, isLoading } = useAuth();
-  if (isLoading) return <Text>Chargement de la session...</Text>;
 
   // Tant que la session n'est pas relue, on n'affiche rien (évite un flash de l'écran login)
   if (isLoading) return null;
