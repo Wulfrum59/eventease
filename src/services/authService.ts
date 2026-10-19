@@ -6,18 +6,17 @@ import { getItem, removeItem, setItem } from "@/services/storage";
 import type { PublicUser, User } from "@/types/user";
 import { generateId } from "@/utils/id";
 
-type RegisterInput = {
+export type RegisterInput = {
   name: string;
   email: string;
   password: string;
 };
 
-type LoginInput = {
+export type LoginInput = {
   email: string;
   password: string;
 };
 
-// ----- Fonctions internes (non exportées : utilisées seulement dans ce fichier) -----
 
 // Hache le mot de passe précédé du sel, en SHA-256
 function hashPassword(password: string, salt: string): Promise<string> {
