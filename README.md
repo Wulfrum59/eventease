@@ -8,7 +8,7 @@ Les membres et bénévoles peuvent consulter les événements, en créer et gér
 
 ## Fonctionnalités
 
-- [ ] Inscription et connexion simulées (sans backend)
+- [ x ] Inscription et connexion simulées (sans backend)
 - [ ] Liste des événements (titre, description, date)
 - [ ] Création, modification et suppression d'un événement
 - [ ] Marquer un événement comme « participé »
