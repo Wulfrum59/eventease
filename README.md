@@ -6,13 +6,19 @@ Les membres et bénévoles peuvent consulter les événements, en créer et gér
 
 > Prototype réalisé en 4 jours dans le cadre de la formation Concepteur Développeur d'Applications.
 
+
 ## Fonctionnalités
 
-- [ x ] Inscription et connexion simulées (sans backend)
-- [ ] Liste des événements (titre, description, date)
-- [ ] Création, modification et suppression d'un événement
-- [ ] Marquer un événement comme « participé »
-- [ ] Persistance locale des données (AsyncStorage)
+- [x] Inscription et connexion simulées (sans backend), mot de passe haché avec sel (SHA-256)
+- [x] Liste des événements (titre, description, date), triée par date
+- [x] Création, modification et suppression d'un événement (suppression avec confirmation)
+- [x] Marquer un événement comme « participé » (participation propre à chaque utilisateur)
+- [x] Persistance locale des données (AsyncStorage)
+
+### Règles métier
+
+- Seul le créateur d'un événement peut le modifier ou le supprimer.
+- La participation n'est plus modifiable une fois l'événement passé.
 
 ## Stack technique
 
