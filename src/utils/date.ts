@@ -18,3 +18,11 @@ export function formatEventDate(isoDate: string): string {
 export function isPastDate(isoDate: string, now: Date = new Date()): boolean {
   return new Date(isoDate).getTime() < now.getTime();
 }
+
+// Date proposée par défaut dans le formulaire : demain à 18h (heure locale)
+export function getDefaultEventDate(now: Date = new Date()): string {
+  const date = new Date(now);
+  date.setDate(date.getDate() + 1); // Gère seul le passage au mois suivant (31 → 1er)
+  date.setHours(18, 0, 0, 0);
+  return date.toISOString();
+}

@@ -26,13 +26,10 @@ function RootNavigator() {
     <Stack screenOptions={{ headerShown: false }}>
       {/* Accessible uniquement si connecté */}
       <Stack.Protected guard={!!user}>
-        <Stack.Screen name="(tabs)" />
-      </Stack.Protected>
-
-      {/* Accessible uniquement si NON connecté */}
-      <Stack.Protected guard={!user}>
-        <Stack.Screen name="(auth)" />
-      </Stack.Protected>
+  <Stack.Screen name="(tabs)" />
+  {/* Écran hors onglets : header affiché (le Stack racine les masque par défaut) */}
+  <Stack.Screen name="event/form" options={{ headerShown: true }} />
+</Stack.Protected>
     </Stack>
   );
 }

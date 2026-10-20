@@ -64,3 +64,30 @@ export function validateRegisterForm(values: RegisterValues): FieldErrors<keyof 
         : undefined,
   };
 }
+
+export const MAX_TITLE_LENGTH = 80;
+
+function validateTitle(title: string): string | undefined {
+  const trimmed = title.trim();
+  if (trimmed === "") return "Le titre est obligatoire.";
+  if (trimmed.length > MAX_TITLE_LENGTH) return `${MAX_TITLE_LENGTH} caractères maximum.`;
+  return undefined;
+}
+
+
+type EventFormValues = {
+  title: string;
+  description: string;
+  date: string; // ISO
+};
+
+export function validateEventForm(values: EventFormValues): FieldErrors<keyof EventFormValues> {
+  return {
+    title: validateTitle(values.title),
+    description: values.description.trim() === "" ? "La description est obligatoire." : undefined,
+
+    // Date.parse renvoie NaN si la chaîne n'est pas une date valide
+    
+    date: Number.isNaN(Date.parse(values.date)) ? "Date invalide." : undefined,
+  };
+}
