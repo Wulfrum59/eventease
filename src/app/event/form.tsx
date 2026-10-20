@@ -1,23 +1,59 @@
 // src/app/event/form.tsx
-import { router, Stack } from "expo-router";
+// Un écran, deux modes : création (/event/form) ou modification (/event/form?id=xxx)
+import { router, Stack, useLocalSearchParams } from "expo-router";
+import { StyleSheet, View } from "react-native";
 
 import { EventForm } from "@/components/events/EventForm";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { colors } from "@/constants/theme";
 import { useEventMutations } from "@/hooks/useEventMutations";
+import { useEvents } from "@/hooks/useEvents";
 import type { EventInput } from "@/services/eventService";
 
 export default function EventFormScreen() {
-  const { createEvent } = useEventMutations();
+  // TOUS les hooks d'abord, avant tout return (règle des hooks)
+  const { id } = useLocalSearchParams<{ id?: string }>(); // id optionnel
+  const { events } = useEvents();
+  const { createEvent, updateEvent } = useEventMutations();
 
-  async function handleCreate(values: EventInput) {
-    await createEvent(values); // En cas d'erreur, EventForm l'attrape et l'affiche
-    router.back(); // Retour à la liste, déjà à jour grâce au refresh du contexte
+  const isEditMode = id !== undefined;
+  const eventToEdit = isEditMode ? events.find((e) => e.id === id) : undefined;
+
+  // Modification demandée, mais événement introuvable (supprimé entre-temps...)
+  if (isEditMode && !eventToEdit) {
+    return (
+      <View style={styles.screen}>
+        <Stack.Screen options={{ title: "Modifier l'événement" }} />
+        <EmptyState title="Événement introuvable" message="Il a peut-être été supprimé." />
+      </View>
+    );
+  }
+
+  async function handleSubmit(values: EventInput) {
+    if (eventToEdit) {
+      await updateEvent(eventToEdit.id, values);
+    } else {
+      await createEvent(values);
+    }
+    router.back(); // Retour à l'écran précédent (détail ou liste), déjà à jour
   }
 
   return (
     <>
-      {/* Configure le header de CET écran depuis l'écran lui-même */}
-      <Stack.Screen options={{ title: "Nouvel événement" }} />
-      <EventForm submitLabel="Créer l'événement" onSubmit={handleCreate} />
+      <Stack.Screen options={{ title: eventToEdit ? "Modifier l'événement" : "Nouvel événement" }} />
+      <EventForm
+        // Un EventItem contient tous les champs d'un EventInput : TypeScript l'accepte
+        initialValues={eventToEdit}
+        submitLabel={eventToEdit ? "Enregistrer les modifications" : "Créer l'événement"}
+        onSubmit={handleSubmit}
+      />
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+});
