@@ -1,6 +1,6 @@
 // src/app/(tabs)/index.tsx
 import { ActivityIndicator, FlatList, StyleSheet, View } from "react-native";
-
+import { router } from "expo-router";
 import { EventCard } from "@/components/events/EventCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { colors, spacing } from "@/constants/theme";
@@ -40,7 +40,7 @@ export default function EventsScreen() {
           event={item}
           isParticipating={!!user && item.participantIds.includes(user.id)}
           // Navigation vers le détail ajoutée à l'étape 2.5
-          onPress={() => console.log("Détail de :", item.title)}
+          onPress={() => router.push({ pathname: "/event/[id]", params: { id: item.id } })}
         />
       )}
       contentContainerStyle={[styles.listContent, events.length === 0 && styles.emptyContent]}
