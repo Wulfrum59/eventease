@@ -1,4 +1,3 @@
-// src/app/event/form.tsx
 // Un écran, deux modes : création (/event/form) ou modification (/event/form?id=xxx)
 import { router, Stack, useLocalSearchParams } from "expo-router";
 import { StyleSheet, View } from "react-native";
@@ -10,6 +9,7 @@ import { useEventMutations } from "@/hooks/useEventMutations";
 import { useEvents } from "@/hooks/useEvents";
 import type { EventInput } from "@/services/eventService";
 
+// Écran qui affiche EventForm et décide quoi faire des valeurs saisies (créer ou modifier)
 export default function EventFormScreen() {
   // TOUS les hooks d'abord, avant tout return (règle des hooks)
   const { id } = useLocalSearchParams<{ id?: string }>(); // id optionnel
@@ -29,6 +29,8 @@ export default function EventFormScreen() {
     );
   }
 
+  // Appelée par EventForm une fois les champs validés.
+  // Les erreurs ne sont pas attrapées ici : EventForm les affiche sous le formulaire.
   async function handleSubmit(values: EventInput) {
     if (eventToEdit) {
       await updateEvent(eventToEdit.id, values);

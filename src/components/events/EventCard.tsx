@@ -1,9 +1,19 @@
-// src/components/events/EventCard.tsx
+// Carte d'un événement dans la liste : bloc date à gauche, contenu à droite.
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { colors, fontSize, opacity, radius, spacing } from "@/constants/theme";
+import { DateBlock } from "@/components/events/DateBlock";
+import {
+  borderWidth,
+  colors,
+  fontSize,
+  fontWeight,
+  lineHeight,
+  opacity,
+  radius,
+  spacing,
+} from "@/constants/theme";
 import type { EventItem } from "@/types/event";
-import { formatEventDate, isPastDate } from "@/utils/date";
+import { getDateParts, isPastDate, isToday } from "@/utils/date";
 
 type EventCardProps = {
   event: EventItem;
@@ -12,86 +22,117 @@ type EventCardProps = {
 };
 
 export function EventCard({ event, isParticipating, onPress }: EventCardProps) {
+  // Valeurs dérivées de l'événement, recalculées à chaque rendu
   const isPast = isPastDate(event.date);
+  const isTodayEvent = isToday(event.date) && !isPast; // Le jour même, mais pas encore commencé
+  const { time } = getDateParts(event.date);
+  const count = event.participantIds.length;
 
   return (
     <Pressable
       onPress={onPress}
       accessibilityRole="button"
-      style={({ pressed }) => [styles.card, isPast && styles.past, pressed && styles.pressed]}
+      // style reçoit une fonction : React Native l'appelle avec l'état d'appui
+      style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
-      <View style={styles.header}>
-        <Text style={styles.title} numberOfLines={1}>
+      <DateBlock isoDate={event.date} isPast={isPast} isToday={isTodayEvent} />
+
+      <View style={styles.content}>
+        {/* Ligne du haut : heure + badges d'état */}
+        <View style={styles.metaRow}>
+          <Text style={[styles.time, isPast && styles.muted]}>{time}</Text>
+          {isTodayEvent ? <Text style={[styles.tag, styles.tagToday]}>Aujourd'hui</Text> : null}
+          {isPast ? <Text style={[styles.tag, styles.tagPast]}>Terminé</Text> : null}
+          {isParticipating ? <Text style={[styles.tag, styles.tagJoined]}>✓ Je participe</Text> : null}
+        </View>
+
+        {/* numberOfLines : coupe le texte avec « ... » au-delà du nombre de lignes */}
+        <Text style={[styles.title, isPast && styles.muted]} numberOfLines={1}>
           {event.title}
         </Text>
-        {isParticipating ? <Text style={styles.badge}>Je participe</Text> : null}
+
+        <Text style={styles.description} numberOfLines={2}>
+          {event.description}
+        </Text>
+
+        <Text style={styles.participants}>
+          {count} participant{count > 1 ? "s" : ""}
+        </Text>
       </View>
-
-      <Text style={styles.date}>
-        {formatEventDate(event.date)}
-        {isPast ? " · terminé" : ""}
-      </Text>
-
-      {/* numberOfLines : coupe le texte avec « ... » au-delà de 2 lignes */}
-      <Text style={styles.description} numberOfLines={2}>
-        {event.description}
-      </Text>
-
-      <Text style={styles.participants}>
-        {event.participantIds.length} participant(s)
-      </Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
+  // ----- Carte -----
   card: {
+    flexDirection: "row", // Bloc date et contenu côte à côte
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
-    padding: spacing.md,
-    gap: spacing.xs,
-    borderWidth: 1,
+    borderWidth: borderWidth.thin,
     borderColor: colors.border,
-  },
-  past: {
-    opacity: opacity.disabled, // Événement passé : visuellement atténué
+    overflow: "hidden", // Le fond du bloc date suit les coins arrondis de la carte
   },
   pressed: {
     opacity: opacity.pressed,
   },
-  header: {
-    flexDirection: "row", // Titre et badge sur la même ligne
+  content: {
+    flex: 1, // Le contenu prend toute la place laissée par le bloc date
+    padding: spacing.md,
+    gap: spacing.xs,
+  },
+
+  // ----- Ligne heure + badges -----
+  metaRow: {
+    flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
+    flexWrap: "wrap", // Les badges passent à la ligne sur petit écran
     gap: spacing.sm,
   },
-  title: {
-    flex: 1, // Le titre prend la place restante et laisse la sienne au badge
-    fontSize: fontSize.lg,
-    fontWeight: "700",
-    color: colors.text,
-  },
-  badge: {
+  time: {
     fontSize: fontSize.sm,
-    fontWeight: "600",
-    color: colors.onPrimary,
-    backgroundColor: colors.success,
+    fontWeight: fontWeight.bold,
+    color: colors.primary,
+  },
+  tag: {
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.semibold,
     paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderRadius: radius.sm,
+    paddingVertical: spacing.xxs,
+    borderRadius: radius.pill,
     overflow: "hidden", // Nécessaire pour que borderRadius s'applique au fond d'un Text
   },
-  date: {
-    fontSize: fontSize.sm,
+  tagToday: {
     color: colors.primary,
-    fontWeight: "600",
+    backgroundColor: colors.primarySoft,
   },
-  description: {
+  tagPast: {
+    color: colors.textMuted,
+    backgroundColor: colors.surfaceMuted,
+  },
+  tagJoined: {
+    color: colors.success,
+    backgroundColor: colors.successSoft,
+  },
+
+  // ----- Textes -----
+  title: {
     fontSize: fontSize.md,
+    fontWeight: fontWeight.bold,
     color: colors.text,
   },
-  participants: {
+  description: {
     fontSize: fontSize.sm,
+    color: colors.textMuted,
+    lineHeight: lineHeight.sm,
+  },
+  participants: {
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.semibold,
+    color: colors.textMuted,
+    marginTop: spacing.xs,
+  },
+  muted: {
     color: colors.textMuted,
   },
 });

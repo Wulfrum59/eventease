@@ -1,8 +1,8 @@
+// Bouton de l'app, en deux variantes : "primary" (action principale) et "danger" (action destructive).
 import { Pressable, StyleSheet, Text } from "react-native";
 
-import { colors, fontSize, opacity, radius, spacing } from "@/constants/theme";
+import { colors, fontSize, fontWeight, opacity, radius, spacing } from "@/constants/theme";
 
-// Type des props déclaré dans le fichier du composant : il ne sert qu'ici
 type ButtonProps = {
   title: string;
   onPress: () => void;
@@ -16,6 +16,8 @@ export function Button({
   variant = "primary", // Valeur par défaut si le parent ne passe pas la prop
   disabled = false,
 }: ButtonProps) {
+  const isDanger = variant === "danger";
+
   return (
     <Pressable
       onPress={onPress}
@@ -25,28 +27,30 @@ export function Button({
       // style reçoit une fonction : React Native l'appelle avec l'état d'appui
       style={({ pressed }) => [
         styles.base,
-        variant === "danger" ? styles.danger : styles.primary,
+        isDanger ? styles.danger : styles.primary,
         pressed && styles.pressed, // false est ignoré : le style ne s'applique que si pressed
         disabled && styles.disabled, // En dernier : prioritaire sur les styles précédents
       ]}
     >
-      <Text style={styles.title}>{title}</Text>
+      <Text style={[styles.title, isDanger ? styles.dangerTitle : styles.primaryTitle]}>{title}</Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
+  // ----- Fond du bouton -----
   base: {
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.ms,
     paddingHorizontal: spacing.lg,
     borderRadius: radius.md,
-    alignItems: "center", // Centre le texte horizontalement (axe secondaire d'une colonne)
+    alignItems: "center", // Centre le texte horizontalement
   },
   primary: {
     backgroundColor: colors.primary,
   },
+  // Danger en version « douce » : fond rosé et texte rouge, moins agressif qu'un aplat rouge
   danger: {
-    backgroundColor: colors.danger,
+    backgroundColor: colors.dangerSoft,
   },
   pressed: {
     opacity: opacity.pressed,
@@ -54,9 +58,16 @@ const styles = StyleSheet.create({
   disabled: {
     opacity: opacity.disabled,
   },
+
+  // ----- Texte du bouton -----
   title: {
-    color: colors.onPrimary,
     fontSize: fontSize.md,
-    fontWeight: "600",
+    fontWeight: fontWeight.semibold,
+  },
+  primaryTitle: {
+    color: colors.onPrimary,
+  },
+  dangerTitle: {
+    color: colors.danger,
   },
 });

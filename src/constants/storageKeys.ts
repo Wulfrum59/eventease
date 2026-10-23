@@ -1,3 +1,5 @@
+// Toutes les clés AsyncStorage de l'app, au même endroit.
+// Le préfixe "@eventease/" évite les conflits avec les clés d'une autre bibliothèque.
 export const STORAGE_KEYS = {
   users: "@eventease/users", // Liste de tous les comptes créés
   session: "@eventease/session", // Id de l'utilisateur connecté

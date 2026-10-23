@@ -9,10 +9,12 @@ export type EventInput = Pick<EventItem, "title" | "description" | "date">;
 
 // ----- Fonctions internes -----
 
+// Lit tous les événements (liste vide au premier lancement)
 async function readEvents(): Promise<EventItem[]> {
   return (await getItem<EventItem[]>(STORAGE_KEYS.events)) ?? [];
 }
 
+// Remplace toute la liste enregistrée par la nouvelle
 async function writeEvents(events: EventItem[]): Promise<void> {
   await setItem(STORAGE_KEYS.events, events);
 }
@@ -34,6 +36,7 @@ export async function getEvents(): Promise<EventItem[]> {
   return [...events].sort((a, b) => a.date.localeCompare(b.date));
 }
 
+// Crée un événement : le service complète les champs techniques (id, créateur, dates)
 export async function createEvent(input: EventInput, userId: string): Promise<EventItem> {
   const events = await readEvents();
   const now = new Date().toISOString();
@@ -53,6 +56,7 @@ export async function createEvent(input: EventInput, userId: string): Promise<Ev
   return newEvent;
 }
 
+// Modifie un événement existant
 export async function updateEvent(id: string, input: EventInput): Promise<EventItem> {
   const events = await readEvents();
   const existing = findEventOrThrow(events, id);
@@ -72,6 +76,7 @@ export async function updateEvent(id: string, input: EventInput): Promise<EventI
   return updated;
 }
 
+// Supprime un événement
 export async function deleteEvent(id: string): Promise<void> {
   const events = await readEvents();
   // filter : on garde tout sauf l'événement supprimé.

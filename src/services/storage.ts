@@ -23,6 +23,7 @@ export async function setItem<T>(key: StorageKey, value: T): Promise<void> {
   await AsyncStorage.setItem(key, JSON.stringify(value));
 }
 
+// Supprime une clé (utilisé à la déconnexion pour effacer la session).
 export async function removeItem(key: StorageKey): Promise<void> {
   await AsyncStorage.removeItem(key);
 }

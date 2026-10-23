@@ -1,12 +1,24 @@
-// src/app/(tabs)/_layout.tsx
 import { Link, Tabs } from "expo-router";
 import { StyleSheet } from "react-native";
 
-import { colors, spacing } from "@/constants/theme";
+import { colors, fontSize, fontWeight, radius, spacing } from "@/constants/theme";
 
+// Barre d'onglets en bas de l'écran : Événements et Profil
 export default function TabsLayout() {
   return (
-    <Tabs screenOptions={{ tabBarActiveTintColor: colors.primary }}>
+    <Tabs
+      screenOptions={{
+        // Barre d'onglets
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textMuted,
+        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border },
+        tabBarLabelStyle: { fontSize: fontSize.sm, fontWeight: fontWeight.semibold },
+        // Header fondu dans le fond de l'écran, sans ombre
+        headerStyle: { backgroundColor: colors.background },
+        headerShadowVisible: false,
+        headerTitleStyle: { fontSize: fontSize.lg, fontWeight: fontWeight.bold, color: colors.text },
+      }}
+    >
       <Tabs.Screen
         name="index"
         options={{
@@ -25,9 +37,16 @@ export default function TabsLayout() {
 }
 
 const styles = StyleSheet.create({
+  // Lien en forme de pilule indigo
   addLink: {
-    color: colors.primary,
-    fontWeight: "600",
+    color: colors.onPrimary,
+    backgroundColor: colors.primary,
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.bold,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
+    borderRadius: radius.pill,
+    overflow: "hidden", // Nécessaire pour que borderRadius s'applique au fond d'un Text
     marginRight: spacing.md,
   },
 });

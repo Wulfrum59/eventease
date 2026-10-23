@@ -1,10 +1,23 @@
-// src/components/ui/DateTimeField.tsx
+// Champ de formulaire pour choisir une date ET une heure.
+// Deux tuiles appuyables ouvrent le sélecteur natif, l'une en mode date, l'autre en mode heure.
 import DateTimePicker, { type DateTimePickerEvent } from "@react-native-community/datetimepicker";
 import { useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { colors, fontSize, radius, spacing } from "@/constants/theme";
-import { formatEventDate } from "@/utils/date";
+import {
+  borderWidth,
+  colors,
+  fontSize,
+  fontWeight,
+  letterSpacing,
+  lineHeight,
+  opacity,
+  radius,
+  sizes,
+  spacing,
+} from "@/constants/theme";
+import { formatFullDay, getDateParts } from "@/utils/date";
+import { capitalize } from "@/utils/text";
 
 type DateTimeFieldProps = {
   label: string;
@@ -17,6 +30,10 @@ export function DateTimeField({ label, value, onChange, error }: DateTimeFieldPr
   // Quel sélecteur est ouvert : la date, l'heure, ou aucun (null)
   const [pickerMode, setPickerMode] = useState<"date" | "time" | null>(null);
 
+  const { weekday, day, month, time } = getDateParts(value);
+  const fullDay = formatFullDay(value);
+
+  // Appelée par le sélecteur natif quand l'utilisateur valide ou annule
   function handleChange(event: DateTimePickerEvent, selected?: Date) {
     // Android : on ferme d'abord, sinon le sélecteur peut se rouvrir au rendu suivant.
     // pickerMode garde ici son ANCIENNE valeur ("date" ou "time") jusqu'au prochain rendu.
@@ -39,13 +56,36 @@ export function DateTimeField({ label, value, onChange, error }: DateTimeFieldPr
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
-      <Text style={[styles.value, error ? styles.valueError : null]}>{formatEventDate(value)}</Text>
 
-      <View style={styles.actions}>
-        <Pressable onPress={() => setPickerMode("date")} accessibilityRole="button">
-          <Text style={styles.action}>Modifier la date</Text>
+      <View style={styles.tiles}>
+        {/* Tuile date : mini page d'agenda + date en toutes lettres */}
+        <Pressable
+          onPress={() => setPickerMode("date")}
+          accessibilityRole="button"
+          accessibilityLabel={`Modifier la date, ${fullDay}`}
+          style={({ pressed }) => [styles.tile, styles.dateTile, !!error && styles.tileError, pressed && styles.pressed]}
+        >
+          <View style={styles.miniBlock}>
+            <Text style={styles.miniWeekday}>{weekday}</Text>
+            <Text style={styles.miniDay}>{day}</Text>
+            <Text style={styles.miniMonth}>{month}</Text>
+          </View>
+          <View style={styles.dateText}>
+            <Text style={styles.value} numberOfLines={2}>
+              {capitalize(fullDay)}
+            </Text>
+            <Text style={styles.action}>Modifier la date</Text>
+          </View>
         </Pressable>
-        <Pressable onPress={() => setPickerMode("time")} accessibilityRole="button">
+
+        {/* Tuile heure */}
+        <Pressable
+          onPress={() => setPickerMode("time")}
+          accessibilityRole="button"
+          accessibilityLabel={`Modifier l'heure, ${time}`}
+          style={({ pressed }) => [styles.tile, styles.timeTile, !!error && styles.tileError, pressed && styles.pressed]}
+        >
+          <Text style={styles.time}>{time}</Text>
           <Text style={styles.action}>Modifier l'heure</Text>
         </Pressable>
       </View>
@@ -67,35 +107,94 @@ export function DateTimeField({ label, value, onChange, error }: DateTimeFieldPr
 
 const styles = StyleSheet.create({
   container: {
-    gap: spacing.xs,
+    gap: spacing.sm,
     alignSelf: "stretch",
   },
   label: {
-    fontSize: fontSize.sm,
-    fontWeight: "600",
-    color: colors.text,
+    fontSize: fontSize.xs,
+    fontWeight: fontWeight.bold,
+    color: colors.textMuted,
+    textTransform: "uppercase",
+    letterSpacing: letterSpacing.md,
   },
-  value: {
+
+  // ----- Tuiles appuyables -----
+  tiles: {
+    flexDirection: "row",
+    gap: spacing.sm,
+  },
+  tile: {
     backgroundColor: colors.surface,
-    borderWidth: 1,
+    borderWidth: borderWidth.thin,
     borderColor: colors.border,
     borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    fontSize: fontSize.md,
-    color: colors.text,
+    padding: spacing.ms,
   },
-  valueError: {
+  tileError: {
     borderColor: colors.danger,
   },
-  actions: {
+  pressed: {
+    opacity: opacity.pressed,
+  },
+  dateTile: {
+    flex: 1.7, // La tuile date prend plus de place que la tuile heure
     flexDirection: "row",
-    gap: spacing.lg,
+    alignItems: "center",
+    gap: spacing.ms,
+  },
+  timeTile: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: spacing.xxs,
+  },
+
+  // ----- Mini bloc date -----
+  miniBlock: {
+    width: sizes.dateBlockSm,
+    alignItems: "center",
+    paddingVertical: spacing.xs,
+    borderRadius: radius.sm,
+    backgroundColor: colors.primarySoft,
+  },
+  miniWeekday: {
+    fontSize: fontSize.xxs,
+    fontWeight: fontWeight.semibold,
+    color: colors.textMuted,
+    textTransform: "uppercase",
+  },
+  miniDay: {
+    fontSize: fontSize.lg,
+    fontWeight: fontWeight.heavy,
+    color: colors.text,
+    lineHeight: lineHeight.md, // Interligne serré : le bloc reste compact
+  },
+  miniMonth: {
+    fontSize: fontSize.xxs,
+    fontWeight: fontWeight.bold,
+    color: colors.primary,
+    textTransform: "uppercase",
+  },
+
+  // ----- Textes -----
+  dateText: {
+    flex: 1,
+    gap: spacing.xxs,
+  },
+  value: {
+    fontSize: fontSize.sm,
+    fontWeight: fontWeight.semibold,
+    color: colors.text,
+  },
+  time: {
+    fontSize: fontSize.xl,
+    fontWeight: fontWeight.heavy,
+    color: colors.primary,
   },
   action: {
+    fontSize: fontSize.xs,
     color: colors.primary,
-    fontWeight: "600",
-    paddingVertical: spacing.xs,
+    fontWeight: fontWeight.semibold,
   },
   error: {
     fontSize: fontSize.sm,

@@ -8,6 +8,9 @@ const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Objet { nomDuChamp: message } ; Partial car seuls les champs en erreur sont présents
 export type FieldErrors<Field extends string> = Partial<Record<Field, string>>;
 
+// ----- Règles par champ -----
+// Chaque fonction renvoie le message d'erreur, ou undefined si le champ est valide
+
 export function validateEmail(email: string): string | undefined {
   if (email.trim() === "") return "L'email est obligatoire.";
   if (!EMAIL_REGEX.test(email.trim())) return "Format d'email invalide.";
@@ -31,6 +34,9 @@ export function validateName(name: string): string | undefined {
 export function hasErrors(errors: Record<string, string | undefined>): boolean {
   return Object.values(errors).some((message) => message !== undefined);
 }
+
+// ----- Validation des formulaires complets -----
+// Chaque fonction renvoie un objet { champ: message } passé tel quel à setErrors
 
 type LoginValues = {
   email: string;
@@ -67,13 +73,13 @@ export function validateRegisterForm(values: RegisterValues): FieldErrors<keyof 
 
 export const MAX_TITLE_LENGTH = 80;
 
+// Titre obligatoire et limité en longueur (espaces de début et de fin ignorés)
 function validateTitle(title: string): string | undefined {
   const trimmed = title.trim();
   if (trimmed === "") return "Le titre est obligatoire.";
   if (trimmed.length > MAX_TITLE_LENGTH) return `${MAX_TITLE_LENGTH} caractères maximum.`;
   return undefined;
 }
-
 
 type EventFormValues = {
   title: string;
@@ -87,7 +93,6 @@ export function validateEventForm(values: EventFormValues): FieldErrors<keyof Ev
     description: values.description.trim() === "" ? "La description est obligatoire." : undefined,
 
     // Date.parse renvoie NaN si la chaîne n'est pas une date valide
-    
     date: Number.isNaN(Date.parse(values.date)) ? "Date invalide." : undefined,
   };
 }

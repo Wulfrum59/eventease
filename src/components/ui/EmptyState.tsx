@@ -1,10 +1,9 @@
-// src/components/ui/EmptyState.tsx
+// Écran d'information générique : liste vide, erreur, événement introuvable...
 import { StyleSheet, Text, View } from "react-native";
 
 import { Button } from "@/components/ui/Button";
-import { colors, fontSize, spacing } from "@/constants/theme";
+import { colors, fontSize, fontWeight, spacing } from "@/constants/theme";
 
-// Écran d'information générique : liste vide, erreur, etc.
 type EmptyStateProps = {
   title: string;
   message: string;
@@ -33,7 +32,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: fontSize.lg,
-    fontWeight: "700",
+    fontWeight: fontWeight.bold,
     color: colors.text,
     textAlign: "center",
   },

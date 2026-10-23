@@ -6,6 +6,7 @@ import { getItem, removeItem, setItem } from "@/services/storage";
 import type { PublicUser, User } from "@/types/user";
 import { generateId } from "@/utils/id";
 
+// Données saisies dans les formulaires d'inscription et de connexion
 export type RegisterInput = {
   name: string;
   email: string;
@@ -17,6 +18,7 @@ export type LoginInput = {
   password: string;
 };
 
+// ----- Fonctions internes -----
 
 // Hache le mot de passe précédé du sel, en SHA-256
 function hashPassword(password: string, salt: string): Promise<string> {
@@ -38,6 +40,7 @@ function toPublicUser(user: User): PublicUser {
   };
 }
 
+// Lit la liste de tous les comptes.
 // Premier lancement : la clé n'existe pas encore, getItem renvoie null → liste vide
 async function getUsers(): Promise<User[]> {
   return (await getItem<User[]>(STORAGE_KEYS.users)) ?? [];
@@ -45,6 +48,7 @@ async function getUsers(): Promise<User[]> {
 
 // ----- API publique du service -----
 
+// Crée un compte (email unique, mot de passe haché) et ouvre la session
 export async function register({ name, email, password }: RegisterInput): Promise<PublicUser> {
   const users = await getUsers();
   const normalizedEmail = normalizeEmail(email);
@@ -71,6 +75,7 @@ export async function register({ name, email, password }: RegisterInput): Promis
   return toPublicUser(newUser);
 }
 
+// Vérifie l'email et le mot de passe, puis ouvre la session
 export async function login({ email, password }: LoginInput): Promise<PublicUser> {
   const users = await getUsers();
   const user = users.find((u) => u.email === normalizeEmail(email));
@@ -89,6 +94,7 @@ export async function login({ email, password }: LoginInput): Promise<PublicUser
   return toPublicUser(user);
 }
 
+// Ferme la session : le compte reste enregistré, seul l'id de session est effacé
 export async function logout(): Promise<void> {
   await removeItem(STORAGE_KEYS.session);
 }

@@ -1,10 +1,11 @@
-// src/app/_layout.tsx
 import { Stack } from "expo-router";
 
+import { colors, fontSize, fontWeight } from "@/constants/theme";
 import { AuthProvider } from "@/context/AuthContext";
 import { EventsProvider } from "@/context/EventsContext";
 import { useAuth } from "@/hooks/useAuth";
 
+// Layout racine : met en place les contextes partagés par toute l'app
 export default function RootLayout() {
   return (
     <AuthProvider>
@@ -25,8 +26,18 @@ function RootNavigator() {
   if (isLoading) return null;
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      {/* Accessible uniquement si connecté */}
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        // Style des headers affichés (détail, formulaire) : même rendu que les onglets
+        headerStyle: { backgroundColor: colors.background },
+        headerShadowVisible: false,
+        headerTintColor: colors.primary, // Couleur de la flèche retour
+        headerTitleStyle: { fontSize: fontSize.lg, fontWeight: fontWeight.bold, color: colors.text },
+        contentStyle: { backgroundColor: colors.background },
+      }}
+    >
+      {/* Écrans accessibles uniquement si connecté */}
       <Stack.Protected guard={!!user}>
         <Stack.Screen name="(tabs)" />
         {/* Écrans hors onglets : header affiché (le Stack racine les masque par défaut) */}
@@ -34,7 +45,7 @@ function RootNavigator() {
         <Stack.Screen name="event/[id]" options={{ headerShown: true, title: "Détail" }} />
       </Stack.Protected>
 
-      {/* Accessible uniquement si NON connecté */}
+      {/* Écrans accessibles uniquement si NON connecté */}
       <Stack.Protected guard={!user}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>
