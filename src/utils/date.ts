@@ -64,6 +64,24 @@ export function isPastDate(isoDate: string, now: Date = new Date()): boolean {
   return new Date(isoDate).getTime() < now.getTime(); // getTime = nombre de millisecondes, facile à comparer
 }
 
+// Clé du jour au format "AAAA-MM-JJ", en heure LOCALE (c'est le format qu'attend le calendrier).
+// Surtout pas isoDate.slice(0, 10) : ça donnerait le jour en UTC. Un événement le 1er novembre
+// à 0h30 en France est stocké "2026-10-31T23:30:00.000Z", le slice le mettrait la veille.
+export function toLocalDateKey(isoDate: string): string {
+  const date = new Date(isoDate); // la chaîne devient une Date
+  const year = date.getFullYear(); // année locale
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // getMonth commence à 0 (janvier = 0), d'où le +1 ; padStart met le 0 devant : "3" → "03"
+  const day = String(date.getDate()).padStart(2, "0"); // jour local sur 2 chiffres
+  return `${year}-${month}-${day}`; // "2026-11-01"
+}
+
+// L'inverse : "2026-11-01" → date ISO de minuit, heure LOCALE, ce jour-là.
+// new Date("2026-11-01") lirait la chaîne comme minuit UTC, et on pourrait tomber la veille selon le fuseau
+export function dateKeyToIso(dateKey: string): string {
+  const [year, month, day] = dateKey.split("-").map(Number); // "2026-11-01" → [2026, 11, 1]
+  return new Date(year, month - 1, day).toISOString(); // new Date(année, mois, jour) travaille en heure locale ; mois - 1 car janvier = 0
+}
+
 // Date proposée par défaut dans le formulaire : demain à 18h (heure locale)
 export function getDefaultEventDate(now: Date = new Date()): string {
   const date = new Date(now); // copie, pour ne pas toucher à "now"

@@ -4,7 +4,7 @@ import { StyleSheet } from "react-native";
 import { TabIcon } from "@/components/ui/TabIcon"; // l'icône des onglets
 import { colors, fontSize, fontWeight, radius, spacing } from "@/constants/theme"; // thème
 
-// La barre d'onglets en bas : Événements et Profil
+// La barre d'onglets en bas : Événements, Calendrier et Profil
 export default function TabsLayout() {
   return (
     <Tabs
@@ -36,6 +36,17 @@ export default function TabsLayout() {
             <Link href="/event/form" style={styles.addLink}>
               + Ajouter
             </Link>
+          ),
+        }}
+      />
+      {/* Onglet Calendrier (fichier calendar.tsx) */}
+      <Tabs.Screen
+        name="calendar"
+        options={{
+          title: "Calendrier", // titre du header et de l'onglet
+          // Icône "calendrier"
+          tabBarIcon: ({ color, size }) => (
+            <TabIcon name={{ ios: "calendar", android: "calendar_month", web: "calendar_month" }} color={color} size={size} />
           ),
         }}
       />
