@@ -1,9 +1,15 @@
 import { Stack } from "expo-router"; // navigation en pile (un écran par-dessus l'autre)
+import * as SplashScreen from "expo-splash-screen"; // l'écran de démarrage (logo sur fond indigo)
+import { useEffect } from "react"; // pour cacher le splash au bon moment
 
 import { colors, fontSize, fontWeight } from "@/constants/theme"; // thème
 import { AuthProvider } from "@/context/AuthContext"; // fournit la connexion
 import { EventsProvider } from "@/context/EventsContext"; // fournit les événements
 import { useAuth } from "@/hooks/useAuth"; // pour savoir qui est connecté
+
+// On demande au splash de rester affiché jusqu'à ce qu'on le cache nous-mêmes.
+// Appelé ici, en dehors de tout composant, pour que ça passe avant que le splash disparaisse tout seul
+SplashScreen.preventAutoHideAsync();
 
 // Le layout racine : il enveloppe toute l'app avec les contextes
 export default function RootLayout() {
@@ -22,7 +28,13 @@ export default function RootLayout() {
 function RootNavigator() {
   const { user, isLoading } = useAuth(); // qui est connecté, et est-ce qu'on charge encore
 
-  // Tant qu'on n'a pas relu la session on n'affiche rien (sinon on voit la page de connexion clignoter)
+  // Dès que la session est relue, on cache le splash
+  useEffect(() => {
+    if (!isLoading) SplashScreen.hide(); // isLoading passe à false → on affiche l'app
+  }, [isLoading]); // relancé à chaque changement de isLoading
+
+  // Tant qu'on n'a pas relu la session, le splash reste devant et on ne rend rien derrière
+  // (sinon on verrait la page de connexion clignoter)
   if (isLoading) return null;
 
   return (
