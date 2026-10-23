@@ -1,14 +1,14 @@
-import { useContext } from "react";
-import { AuthContext } from "@/context/AuthContext";
+import { useContext } from "react"; // pour lire un contexte
+import { AuthContext } from "@/context/AuthContext"; // le contexte de connexion
 
-// Point d'accès unique au contexte d'authentification pour les écrans
+// La porte d'entrée pour que les écrans accèdent à la connexion
 export function useAuth() {
-  const context = useContext(AuthContext);
+  const context = useContext(AuthContext); // on lit le contexte
 
-  // Oubli du Provider = bug du développeur : on le signale immédiatement et clairement
+  // Si c'est null, c'est qu'on a oublié le Provider : c'est un bug de dev, on le dit tout de suite
   if (!context) {
     throw new Error("useAuth doit être utilisé à l'intérieur d'un AuthProvider.");
   }
 
-  return context;
+  return context; // user, isLoading, login, register, logout
 }

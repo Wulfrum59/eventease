@@ -1,15 +1,15 @@
-import { Stack } from "expo-router";
+import { Stack } from "expo-router"; // navigation en pile (un écran par-dessus l'autre)
 
-import { colors, fontSize, fontWeight } from "@/constants/theme";
-import { AuthProvider } from "@/context/AuthContext";
-import { EventsProvider } from "@/context/EventsContext";
-import { useAuth } from "@/hooks/useAuth";
+import { colors, fontSize, fontWeight } from "@/constants/theme"; // thème
+import { AuthProvider } from "@/context/AuthContext"; // fournit la connexion
+import { EventsProvider } from "@/context/EventsContext"; // fournit les événements
+import { useAuth } from "@/hooks/useAuth"; // pour savoir qui est connecté
 
-// Layout racine : met en place les contextes partagés par toute l'app
+// Le layout racine : il enveloppe toute l'app avec les contextes
 export default function RootLayout() {
   return (
     <AuthProvider>
-      {/* À l'intérieur d'AuthProvider : EventsProvider utilise useAuth() */}
+      {/* EventsProvider est dedans parce qu'il a besoin de useAuth() */}
       <EventsProvider>
         <RootNavigator />
       </EventsProvider>
@@ -17,35 +17,35 @@ export default function RootLayout() {
   );
 }
 
-// Composant séparé OBLIGATOIRE : useAuth() doit être appelé dans un enfant de <AuthProvider>.
+// Composant à part obligé : useAuth() doit être appelé dans un enfant d'<AuthProvider>.
 // Dans RootLayout lui-même, le Provider n'existe pas encore au moment de l'appel.
 function RootNavigator() {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading } = useAuth(); // qui est connecté, et est-ce qu'on charge encore
 
-  // Tant que la session n'est pas relue, on n'affiche rien (évite un flash de l'écran login)
+  // Tant qu'on n'a pas relu la session on n'affiche rien (sinon on voit la page de connexion clignoter)
   if (isLoading) return null;
 
   return (
     <Stack
       screenOptions={{
-        headerShown: false,
-        // Style des headers affichés (détail, formulaire) : même rendu que les onglets
-        headerStyle: { backgroundColor: colors.background },
-        headerShadowVisible: false,
-        headerTintColor: colors.primary, // Couleur de la flèche retour
-        headerTitleStyle: { fontSize: fontSize.lg, fontWeight: fontWeight.bold, color: colors.text },
-        contentStyle: { backgroundColor: colors.background },
+        headerShown: false, // pas de header par défaut
+        // Style des headers quand on les affiche (détail, formulaire) : pareil que les onglets
+        headerStyle: { backgroundColor: colors.background }, // fond du header
+        headerShadowVisible: false, // pas d'ombre sous le header
+        headerTintColor: colors.primary, // couleur de la flèche retour
+        headerTitleStyle: { fontSize: fontSize.lg, fontWeight: fontWeight.bold, color: colors.text }, // le titre
+        contentStyle: { backgroundColor: colors.background }, // fond derrière les écrans
       }}
     >
-      {/* Écrans accessibles uniquement si connecté */}
+      {/* Ces écrans-là ne sont dispo que si on est connecté */}
       <Stack.Protected guard={!!user}>
         <Stack.Screen name="(tabs)" />
-        {/* Écrans hors onglets : header affiché (le Stack racine les masque par défaut) */}
+        {/* Écrans en dehors des onglets : on remet le header pour avoir la flèche retour */}
         <Stack.Screen name="event/form" options={{ headerShown: true }} />
         <Stack.Screen name="event/[id]" options={{ headerShown: true, title: "Détail" }} />
       </Stack.Protected>
 
-      {/* Écrans accessibles uniquement si NON connecté */}
+      {/* Et ceux-là seulement si on n'est pas connecté */}
       <Stack.Protected guard={!user}>
         <Stack.Screen name="(auth)" />
       </Stack.Protected>

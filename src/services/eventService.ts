@@ -1,17 +1,18 @@
-// CRUD des événements + participation. Toutes les données passent par storage.ts.
-import { STORAGE_KEYS } from "@/constants/storageKeys";
-import { getItem, setItem } from "@/services/storage";
-import type { EventItem } from "@/types/event";
-import { generateId } from "@/utils/id";
+// Tout ce qui touche aux événements : lire, créer, modifier, supprimer, participer.
+// Les données passent toutes par storage.ts.
+import { STORAGE_KEYS } from "@/constants/storageKeys"; // les clés de stockage
+import { getItem, setItem } from "@/services/storage"; // lecture / écriture
+import type { EventItem } from "@/types/event"; // le type d'un événement
+import { generateId } from "@/utils/id"; // pour les ids
 
-// Ce que l'utilisateur saisit dans le formulaire. Le reste (id, dates techniques...) est géré ici.
+// Ce que l'utilisateur remplit dans le formulaire. Le reste (id, créateur, dates techniques), c'est nous qui gérons.
 export type EventInput = Pick<EventItem, "title" | "description" | "date">;
 
 // ----- Fonctions internes -----
 
 // Lit tous les événements (liste vide au premier lancement)
 async function readEvents(): Promise<EventItem[]> {
-  return (await getItem<EventItem[]>(STORAGE_KEYS.events)) ?? [];
+  return (await getItem<EventItem[]>(STORAGE_KEYS.events)) ?? []; // null → []
 }
 
 // Remplace toute la liste enregistrée par la nouvelle
@@ -19,84 +20,84 @@ async function writeEvents(events: EventItem[]): Promise<void> {
   await setItem(STORAGE_KEYS.events, events);
 }
 
-// Factorise la recherche + l'erreur, utilisée par update et toggleParticipation
+// Cherche un événement par son id, et lance une erreur s'il n'existe pas (sert à update et à la participation)
 function findEventOrThrow(events: EventItem[], id: string): EventItem {
-  const event = events.find((e) => e.id === id);
-  if (!event) throw new Error("Événement introuvable.");
-  return event;
+  const event = events.find((e) => e.id === id); // on cherche
+  if (!event) throw new Error("Événement introuvable."); // pas trouvé
+  return event; // trouvé
 }
 
-// ----- API publique -----
+// ----- Fonctions utilisées par le reste de l'app -----
 
-// Retourne les événements triés du plus proche au plus lointain
+// Renvoie les événements triés, du plus proche au plus lointain
 export async function getEvents(): Promise<EventItem[]> {
-  const events = await readEvents();
-  // Les dates ISO ont toutes le même format : l'ordre alphabétique = l'ordre chronologique.
-  // [...events] : sort() modifie le tableau sur place, on trie donc une copie
+  const events = await readEvents(); // tout le stockage
+  // Les dates ISO ont toutes le même format, donc l'ordre alphabétique = l'ordre chronologique.
+  // [...events] fait une copie, parce que sort() modifie le tableau d'origine
   return [...events].sort((a, b) => a.date.localeCompare(b.date));
 }
 
-// Crée un événement : le service complète les champs techniques (id, créateur, dates)
+// Crée un événement : on complète nous-mêmes l'id, le créateur et les dates
 export async function createEvent(input: EventInput, userId: string): Promise<EventItem> {
-  const events = await readEvents();
-  const now = new Date().toISOString();
+  const events = await readEvents(); // la liste actuelle
+  const now = new Date().toISOString(); // maintenant, en ISO
 
   const newEvent: EventItem = {
-    id: generateId(),
-    title: input.title.trim(),
-    description: input.description.trim(),
-    date: input.date,
-    createdBy: userId,
-    participantIds: [],
+    id: generateId(), // nouvel id
+    title: input.title.trim(), // titre sans espaces autour
+    description: input.description.trim(), // pareil pour la description
+    date: input.date, // la date choisie
+    createdBy: userId, // qui l'a créé
+    participantIds: [], // personne ne participe au début
     createdAt: now,
     updatedAt: now,
   };
 
-  await writeEvents([...events, newEvent]);
-  return newEvent;
+  await writeEvents([...events, newEvent]); // ancienne liste + le nouveau
+  return newEvent; // on le renvoie à l'appelant
 }
 
-// Modifie un événement existant
+// Modifie un événement qui existe déjà
 export async function updateEvent(id: string, input: EventInput): Promise<EventItem> {
-  const events = await readEvents();
-  const existing = findEventOrThrow(events, id);
+  const events = await readEvents(); // la liste actuelle
+  const existing = findEventOrThrow(events, id); // l'événement à modifier
 
-  // Spread : copie de l'existant, puis on écrase uniquement les champs modifiés.
-  // id, createdBy, participantIds et createdAt sont conservés tels quels.
+  // ...existing recopie tout, puis on écrase seulement les champs modifiés.
+  // id, createdBy, participantIds et createdAt ne bougent pas.
   const updated: EventItem = {
     ...existing,
     title: input.title.trim(),
     description: input.description.trim(),
     date: input.date,
-    updatedAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(), // date de la modif
   };
 
-  // map : même liste, sauf l'élément ciblé qui est remplacé
+  // map : on garde la même liste, sauf celui qu'on remplace par la nouvelle version
   await writeEvents(events.map((e) => (e.id === id ? updated : e)));
   return updated;
 }
 
 // Supprime un événement
 export async function deleteEvent(id: string): Promise<void> {
-  const events = await readEvents();
-  // filter : on garde tout sauf l'événement supprimé.
-  // Si l'id n'existe pas, la liste est inchangée (pas d'erreur : le résultat voulu est atteint)
+  const events = await readEvents(); // la liste actuelle
+  // filter : on garde tout sauf celui-là.
+  // Si l'id n'existe pas, la liste reste pareille, pas besoin d'erreur : il n'est plus là de toute façon
   await writeEvents(events.filter((e) => e.id !== id));
 }
 
 // Ajoute l'utilisateur aux participants, ou le retire s'il y est déjà
 export async function toggleParticipation(eventId: string, userId: string): Promise<EventItem> {
-  const events = await readEvents();
-  const existing = findEventOrThrow(events, eventId);
+  const events = await readEvents(); // la liste actuelle
+  const existing = findEventOrThrow(events, eventId); // l'événement concerné
 
-  const isParticipating = existing.participantIds.includes(userId);
+  const isParticipating = existing.participantIds.includes(userId); // il participe déjà ?
   const updated: EventItem = {
-    ...existing,
+    ...existing, // on recopie tout
     participantIds: isParticipating
-      ? existing.participantIds.filter((id) => id !== userId) // Retrait
-      : [...existing.participantIds, userId], // Ajout
+      ? existing.participantIds.filter((id) => id !== userId) // oui : on le retire
+      : [...existing.participantIds, userId], // non : on l'ajoute
   };
 
-  await writeEvents(events.map((e) => (e.id === eventId ? updated : e)));
+  await writeEvents(events.map((e) => (e.id === eventId ? updated : e))); // on remplace dans la liste
   return updated;
 }

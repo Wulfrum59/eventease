@@ -1,27 +1,28 @@
-// En-tête des écrans de connexion / inscription : icône calendrier + titre + sous-titre.
-// L'icône est dessinée avec des View : aucune image ni ressource externe à charger.
+// En-tête des écrans connexion / inscription : petite icône calendrier + titre + sous-titre.
+// L'icône est dessinée avec des View, pas d'image à charger.
 import { StyleSheet, Text, View } from "react-native";
 
 import { borderWidth, colors, fontSize, fontWeight, lineHeight, radius, sizes, spacing } from "@/constants/theme";
 
+// Les props acceptées
 type AuthHeaderProps = {
-  title: string;
-  subtitle: string;
+  title: string; // le gros titre
+  subtitle: string; // la phrase en dessous
 };
 
 export function AuthHeader({ title, subtitle }: AuthHeaderProps) {
-  const today = new Date().getDate(); // L'icône affiche le jour du mois courant
+  const today = new Date().getDate(); // le numéro du jour, affiché dans l'icône
 
   return (
     <View style={styles.container}>
-      {/* Icône calendrier, purement décorative : masquée au lecteur d'écran */}
+      {/* L'icône calendrier, juste déco : on la cache au lecteur d'écran */}
       <View style={styles.icon} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-        {/* Bande du haut avec les deux anneaux de reliure */}
+        {/* La bande du haut avec les deux anneaux */}
         <View style={styles.iconBand}>
           <View style={styles.ring} />
           <View style={styles.ring} />
         </View>
-        {/* Zone du bas : le numéro du jour, centré dans la place restante */}
+        {/* Le bas de l'icône : le numéro du jour, centré dans la place qui reste */}
         <View style={styles.iconBody}>
           <Text style={styles.iconDay}>{today}</Text>
         </View>
@@ -35,58 +36,58 @@ export function AuthHeader({ title, subtitle }: AuthHeaderProps) {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: "center",
-    gap: spacing.xs,
-    marginBottom: spacing.sm,
+    alignItems: "center", // tout centré horizontalement
+    gap: spacing.xs, // petit espace entre les éléments
+    marginBottom: spacing.sm, // un peu d'air en dessous
   },
 
-  // ----- Icône calendrier -----
+  // ----- L'icône calendrier -----
   icon: {
-    width: sizes.authIcon,
+    width: sizes.authIcon, // carré
     height: sizes.authIcon,
-    borderRadius: radius.lg,
-    backgroundColor: colors.surface,
-    borderWidth: borderWidth.thin,
+    borderRadius: radius.lg, // coins arrondis
+    backgroundColor: colors.surface, // fond blanc
+    borderWidth: borderWidth.thin, // bordure fine
     borderColor: colors.border,
-    overflow: "hidden", // La bande indigo suit les coins arrondis
-    marginBottom: spacing.md,
+    overflow: "hidden", // la bande indigo est coupée par les coins arrondis
+    marginBottom: spacing.md, // espace avant le titre
   },
   iconBand: {
-    height: sizes.authIconBand,
-    backgroundColor: colors.primary,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    paddingHorizontal: spacing.md,
+    height: sizes.authIconBand, // hauteur de la bande
+    backgroundColor: colors.primary, // indigo
+    flexDirection: "row", // les anneaux côte à côte
+    justifyContent: "space-around", // répartis sur la largeur
+    alignItems: "center", // centrés verticalement dans la bande
+    paddingHorizontal: spacing.md, // pas collés aux bords
   },
   ring: {
-    width: sizes.authIconRing,
+    width: sizes.authIconRing, // petit rond
     height: sizes.authIconRing,
-    borderRadius: radius.pill, // Coins arrondis au maximum : un cercle
-    backgroundColor: colors.onPrimary,
+    borderRadius: radius.pill, // arrondi max = cercle
+    backgroundColor: colors.onPrimary, // blanc
   },
   iconBody: {
-    flex: 1, // Prend toute la hauteur sous la bande
-    alignItems: "center",
-    justifyContent: "center",
+    flex: 1, // prend toute la hauteur sous la bande
+    alignItems: "center", // centre le chiffre horizontalement
+    justifyContent: "center", // et verticalement
   },
   iconDay: {
-    fontSize: fontSize.xl,
-    fontWeight: fontWeight.heavy,
+    fontSize: fontSize.xl, // gros chiffre
+    fontWeight: fontWeight.heavy, // très gras
     color: colors.text,
   },
 
-  // ----- Textes -----
+  // ----- Les textes -----
   title: {
-    fontSize: fontSize.xl,
-    fontWeight: fontWeight.heavy,
+    fontSize: fontSize.xl, // gros
+    fontWeight: fontWeight.heavy, // très gras
     color: colors.text,
     textAlign: "center",
   },
   subtitle: {
     fontSize: fontSize.md,
-    color: colors.textMuted,
+    color: colors.textMuted, // gris
     textAlign: "center",
-    lineHeight: lineHeight.md,
+    lineHeight: lineHeight.md, // lignes un peu aérées
   },
 });

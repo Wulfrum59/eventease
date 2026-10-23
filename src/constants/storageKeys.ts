@@ -1,10 +1,10 @@
-// Toutes les clés AsyncStorage de l'app, au même endroit.
-// Le préfixe "@eventease/" évite les conflits avec les clés d'une autre bibliothèque.
+// Toutes les clés AsyncStorage de l'app, rangées au même endroit pour ne jamais faire de faute de frappe.
+// Le préfixe "@eventease/" évite de se mélanger avec les clés d'une autre lib.
 export const STORAGE_KEYS = {
-  users: "@eventease/users", // Liste de tous les comptes créés
-  session: "@eventease/session", // Id de l'utilisateur connecté
-  events: "@eventease/events", // Liste de tous les événements
-} as const;
+  users: "@eventease/users", // la liste de tous les comptes
+  session: "@eventease/session", // l'id de la personne connectée
+  events: "@eventease/events", // la liste de tous les événements
+} as const; // as const : les valeurs sont figées, TypeScript connaît le texte exact
 
-// Type qui n'accepte QUE les valeurs ci-dessus : "@eventease/users" | "@eventease/session" | ...
+// Type qui accepte seulement les 3 valeurs du dessus, du coup impossible de passer une clé inventée
 export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];

@@ -1,29 +1,30 @@
-import { Link, Tabs } from "expo-router";
+import { Link, Tabs } from "expo-router"; // Link = lien, Tabs = barre d'onglets
 import { StyleSheet } from "react-native";
 
-import { colors, fontSize, fontWeight, radius, spacing } from "@/constants/theme";
+import { colors, fontSize, fontWeight, radius, spacing } from "@/constants/theme"; // thème
 
-// Barre d'onglets en bas de l'écran : Événements et Profil
+// La barre d'onglets en bas : Événements et Profil
 export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        // Barre d'onglets
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textMuted,
-        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border },
-        tabBarLabelStyle: { fontSize: fontSize.sm, fontWeight: fontWeight.semibold },
-        // Header fondu dans le fond de l'écran, sans ombre
-        headerStyle: { backgroundColor: colors.background },
-        headerShadowVisible: false,
-        headerTitleStyle: { fontSize: fontSize.lg, fontWeight: fontWeight.bold, color: colors.text },
+        // La barre d'onglets
+        tabBarActiveTintColor: colors.primary, // onglet actif en indigo
+        tabBarInactiveTintColor: colors.textMuted, // les autres en gris
+        tabBarStyle: { backgroundColor: colors.surface, borderTopColor: colors.border }, // fond blanc + trait en haut
+        tabBarLabelStyle: { fontSize: fontSize.sm, fontWeight: fontWeight.semibold }, // texte des onglets
+        // Le header se fond dans le fond de l'écran, sans ombre
+        headerStyle: { backgroundColor: colors.background }, // fond du header
+        headerShadowVisible: false, // pas d'ombre
+        headerTitleStyle: { fontSize: fontSize.lg, fontWeight: fontWeight.bold, color: colors.text }, // le titre
       }}
     >
+      {/* Onglet Événements (fichier index.tsx) */}
       <Tabs.Screen
         name="index"
         options={{
-          title: "Événements",
-          // Bouton dans le header, à droite, uniquement sur l'onglet Événements
+          title: "Événements", // titre du header et de l'onglet
+          // Bouton "+ Ajouter" à droite du header, seulement sur cet onglet
           headerRight: () => (
             <Link href="/event/form" style={styles.addLink}>
               + Ajouter
@@ -31,22 +32,23 @@ export default function TabsLayout() {
           ),
         }}
       />
+      {/* Onglet Profil (fichier profile.tsx) */}
       <Tabs.Screen name="profile" options={{ title: "Profil" }} />
     </Tabs>
   );
 }
 
 const styles = StyleSheet.create({
-  // Lien en forme de pilule indigo
+  // Le lien "+ Ajouter" en forme de pilule indigo
   addLink: {
-    color: colors.onPrimary,
-    backgroundColor: colors.primary,
-    fontSize: fontSize.sm,
-    fontWeight: fontWeight.bold,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.xs,
-    borderRadius: radius.pill,
-    overflow: "hidden", // Nécessaire pour que borderRadius s'applique au fond d'un Text
-    marginRight: spacing.md,
+    color: colors.onPrimary, // texte blanc
+    backgroundColor: colors.primary, // fond indigo
+    fontSize: fontSize.sm, // petit texte
+    fontWeight: fontWeight.bold, // gras
+    paddingHorizontal: spacing.md, // espace sur les côtés
+    paddingVertical: spacing.xs, // un peu en haut et en bas
+    borderRadius: radius.pill, // forme pilule
+    overflow: "hidden", // sinon l'arrondi ne s'applique pas au fond d'un Text
+    marginRight: spacing.md, // pas collé au bord droit
   },
 });

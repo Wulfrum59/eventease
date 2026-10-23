@@ -1,25 +1,25 @@
-// Un écran, deux modes : création (/event/form) ou modification (/event/form?id=xxx)
-import { router, Stack, useLocalSearchParams } from "expo-router";
+// Un seul écran pour deux usages : création (/event/form) ou modification (/event/form?id=xxx)
+import { router, Stack, useLocalSearchParams } from "expo-router"; // navigation + lecture de l'URL
 import { StyleSheet, View } from "react-native";
 
-import { EventForm } from "@/components/events/EventForm";
-import { EmptyState } from "@/components/ui/EmptyState";
-import { colors } from "@/constants/theme";
-import { useEventMutations } from "@/hooks/useEventMutations";
-import { useEvents } from "@/hooks/useEvents";
-import type { EventInput } from "@/services/eventService";
+import { EventForm } from "@/components/events/EventForm"; // le formulaire
+import { EmptyState } from "@/components/ui/EmptyState"; // l'écran "introuvable"
+import { colors } from "@/constants/theme"; // thème
+import { useEventMutations } from "@/hooks/useEventMutations"; // créer / modifier
+import { useEvents } from "@/hooks/useEvents"; // la liste
+import type { EventInput } from "@/services/eventService"; // les champs du formulaire
 
-// Écran qui affiche EventForm et décide quoi faire des valeurs saisies (créer ou modifier)
+// L'écran qui affiche EventForm et décide quoi faire des valeurs (créer ou modifier)
 export default function EventFormScreen() {
-  // TOUS les hooks d'abord, avant tout return (règle des hooks)
-  const { id } = useLocalSearchParams<{ id?: string }>(); // id optionnel
-  const { events } = useEvents();
-  const { createEvent, updateEvent } = useEventMutations();
+  // Tous les hooks d'abord, avant n'importe quel return (règle des hooks)
+  const { id } = useLocalSearchParams<{ id?: string }>(); // l'id dans l'URL, s'il y en a un
+  const { events } = useEvents(); // la liste des événements
+  const { createEvent, updateEvent } = useEventMutations(); // les fonctions d'écriture
 
-  const isEditMode = id !== undefined;
-  const eventToEdit = isEditMode ? events.find((e) => e.id === id) : undefined;
+  const isEditMode = id !== undefined; // un id = on modifie, pas d'id = on crée
+  const eventToEdit = isEditMode ? events.find((e) => e.id === id) : undefined; // l'événement à modifier
 
-  // Modification demandée, mais événement introuvable (supprimé entre-temps...)
+  // On veut modifier, mais l'événement n'existe plus (supprimé entre-temps par ex.)
   if (isEditMode && !eventToEdit) {
     return (
       <View style={styles.screen}>
@@ -30,24 +30,25 @@ export default function EventFormScreen() {
   }
 
   // Appelée par EventForm une fois les champs validés.
-  // Les erreurs ne sont pas attrapées ici : EventForm les affiche sous le formulaire.
+  // On n'attrape pas les erreurs ici : EventForm les affiche lui-même sous le formulaire.
   async function handleSubmit(values: EventInput) {
     if (eventToEdit) {
-      await updateEvent(eventToEdit.id, values);
+      await updateEvent(eventToEdit.id, values); // modification
     } else {
-      await createEvent(values);
+      await createEvent(values); // création
     }
-    router.back(); // Retour à l'écran précédent (détail ou liste), déjà à jour
+    router.back(); // retour à l'écran d'avant (détail ou liste), qui est déjà à jour
   }
 
   return (
     <>
+      {/* Le titre du header change selon le mode */}
       <Stack.Screen options={{ title: eventToEdit ? "Modifier l'événement" : "Nouvel événement" }} />
       <EventForm
-        // Un EventItem contient tous les champs d'un EventInput : TypeScript l'accepte
+        // Un EventItem a tous les champs d'un EventInput, donc TypeScript l'accepte
         initialValues={eventToEdit}
-        submitLabel={eventToEdit ? "Enregistrer les modifications" : "Créer l'événement"}
-        onSubmit={handleSubmit}
+        submitLabel={eventToEdit ? "Enregistrer les modifications" : "Créer l'événement"} // texte du bouton
+        onSubmit={handleSubmit} // ce qui se passe à la validation
       />
     </>
   );
@@ -55,7 +56,7 @@ export default function EventFormScreen() {
 
 const styles = StyleSheet.create({
   screen: {
-    flex: 1,
+    flex: 1, // tout l'écran
     backgroundColor: colors.background,
   },
 });

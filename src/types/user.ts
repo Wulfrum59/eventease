@@ -1,12 +1,12 @@
-// Utilisateur tel qu'il est stocké. Le mot de passe n'est JAMAIS stocké en clair.
+// Un utilisateur tel qu'on le range dans le stockage (le mot de passe n'y est jamais en clair)
 export type User = {
-  id: string;
-  name: string;
-  email: string;
-  passwordHash: string;
-  salt: string; // Chaîne aléatoire propre à chaque utilisateur, mélangée au mot de passe avant hachage
-  createdAt: string; // Date ISO
+  id: string; // identifiant unique
+  name: string; // nom affiché sur le profil
+  email: string; // email, toujours en minuscules
+  passwordHash: string; // empreinte du mot de passe (le hash), pas le mot de passe lui-même
+  salt: string; // chaîne aléatoire propre à chaque compte, mélangée au mot de passe avant le hash
+  createdAt: string; // date d'inscription, en ISO
 };
 
-// Ce que le reste de l'app a le droit de voir : sans hash ni sel
+// Ce que le reste de l'app a le droit de voir : on garde tout sauf le hash et le sel
 export type PublicUser = Pick<User, "id" | "name" | "email" | "createdAt">;

@@ -1,39 +1,39 @@
-// Champ de saisie avec libellé et message d'erreur, basé sur le TextInput natif.
-import { useState } from "react";
+// Champ de saisie avec son libellé au-dessus et son message d'erreur en dessous
+import { useState } from "react"; // pour retenir si le champ a le focus
 import { StyleSheet, Text, TextInput, View, type TextInputProps } from "react-native";
 
 import { borderWidth, colors, fontSize, fontWeight, letterSpacing, radius, spacing } from "@/constants/theme";
 
-// Toutes les props natives de TextInput (value, onChangeText, secureTextEntry...) + les nôtres
+// Toutes les props normales d'un TextInput (value, onChangeText, secureTextEntry...) + les nôtres
 type InputProps = TextInputProps & {
-  label: string;
-  error?: string;
+  label: string; // le libellé au-dessus
+  error?: string; // message d'erreur, optionnel
 };
 
-// "...textInputProps" récupère toutes les props qu'on n'a pas nommées dans la déstructuration
+// "...textInputProps" ramasse toutes les props qu'on n'a pas nommées juste avant
 export function Input({ label, error, style, onFocus, onBlur, ...textInputProps }: InputProps) {
-  // Purement visuel : bordure indigo tant que le champ a le focus
+  // Juste pour le visuel : bordure indigo quand on est dans le champ
   const [isFocused, setIsFocused] = useState(false);
 
   return (
     <View style={styles.container}>
       <Text style={styles.label}>{label}</Text>
       <TextInput
-        // "style" du parent en dernier : il peut compléter ou remplacer nos styles
+        // le "style" du parent en dernier, comme ça il peut compléter ou remplacer le nôtre
         style={[styles.input, isFocused && styles.inputFocused, error ? styles.inputError : null, style]}
-        placeholderTextColor={colors.textMuted}
-        {...textInputProps} // Transmet toutes les autres props au TextInput natif
-        // Après le spread : on garde notre gestion du focus ET on appelle celle du parent s'il en passe une
+        placeholderTextColor={colors.textMuted} // couleur du texte d'exemple
+        {...textInputProps} // on refile toutes les autres props au TextInput
+        // Placés après le spread : on gère notre focus ET on appelle celui du parent s'il en a donné un
         onFocus={(e) => {
-          setIsFocused(true);
-          onFocus?.(e);
+          setIsFocused(true); // on entre dans le champ
+          onFocus?.(e); // ?.() : on l'appelle seulement s'il existe
         }}
         onBlur={(e) => {
-          setIsFocused(false);
-          onBlur?.(e);
+          setIsFocused(false); // on sort du champ
+          onBlur?.(e); // pareil, seulement s'il existe
         }}
       />
-      {/* Ternaire plutôt que && : avec une chaîne vide, && afficherait "" hors d'un <Text> et ferait planter l'app */}
+      {/* Ternaire plutôt que && : avec une chaîne vide, && afficherait "" hors d'un <Text> et ça planterait */}
       {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>
   );
@@ -41,34 +41,34 @@ export function Input({ label, error, style, onFocus, onBlur, ...textInputProps 
 
 const styles = StyleSheet.create({
   container: {
-    gap: spacing.sm,
-    alignSelf: "stretch", // Prend toute la largeur disponible
+    gap: spacing.sm, // espace entre libellé, champ et erreur
+    alignSelf: "stretch", // prend toute la largeur
   },
   label: {
-    fontSize: fontSize.xs,
-    fontWeight: fontWeight.bold,
-    color: colors.textMuted,
-    textTransform: "uppercase",
-    letterSpacing: letterSpacing.md,
+    fontSize: fontSize.xs, // petit
+    fontWeight: fontWeight.bold, // gras
+    color: colors.textMuted, // gris
+    textTransform: "uppercase", // en majuscules
+    letterSpacing: letterSpacing.md, // lettres un peu espacées
   },
   input: {
-    backgroundColor: colors.surface,
-    borderWidth: borderWidth.thin,
-    borderColor: colors.border,
-    borderRadius: radius.md,
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.ms,
-    fontSize: fontSize.md,
-    color: colors.text,
+    backgroundColor: colors.surface, // fond blanc
+    borderWidth: borderWidth.thin, // bordure fine
+    borderColor: colors.border, // couleur de la bordure
+    borderRadius: radius.md, // coins arrondis
+    paddingHorizontal: spacing.md, // espace à gauche et à droite du texte
+    paddingVertical: spacing.ms, // espace en haut et en bas
+    fontSize: fontSize.md, // taille du texte tapé
+    color: colors.text, // couleur du texte tapé
   },
   inputFocused: {
-    borderColor: colors.primary,
+    borderColor: colors.primary, // bordure indigo quand on est dedans
   },
   inputError: {
-    borderColor: colors.danger, // Après inputFocused : l'erreur reste visible même avec le focus
+    borderColor: colors.danger, // rouge en cas d'erreur (placé après, donc gagne sur le focus)
   },
   error: {
-    fontSize: fontSize.sm,
-    color: colors.danger,
+    fontSize: fontSize.sm, // petit
+    color: colors.danger, // rouge
   },
 });

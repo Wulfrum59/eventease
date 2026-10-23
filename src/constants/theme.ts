@@ -1,71 +1,71 @@
-// Thème centralisé : toutes les valeurs visuelles de l'app sont définies ici.
-// Style « agenda » : fond papier légèrement chaud, encre sombre, un accent indigo.
+// Tout le look de l'app est réglé ici : couleurs, tailles, espacements...
+// Les composants piochent dedans, comme ça on change le style à un seul endroit.
 // "as const" fige les valeurs : TypeScript connaît la valeur exacte et interdit de la modifier.
 
 // ----- Couleurs -----
 export const colors = {
-  primary: "#4F46E5", // Indigo : couleur d'accent (boutons, liens, jour courant)
-  primarySoft: "#EEF0FF", // Fond léger associé à primary (blocs date, badges)
-  onPrimary: "#FFFFFF", // Texte posé sur un fond primary
-  background: "#F6F5F2", // Fond « papier » des écrans
-  surface: "#FFFFFF", // Fond des cartes et des champs
-  surfaceMuted: "#EFEEEA", // Fond atténué (événements passés)
-  text: "#1C1B22",
-  textMuted: "#6B6A75",
-  border: "#E4E2DC",
-  danger: "#D93F3F",
-  dangerSoft: "#FDECEC",
-  success: "#1F9D6B",
-  successSoft: "#E6F6EF",
+  primary: "#4F46E5", // indigo, la couleur principale (boutons, liens, jour courant)
+  primarySoft: "#EEF0FF", // version très claire de l'indigo, pour les fonds (blocs date, badges)
+  onPrimary: "#FFFFFF", // texte posé sur du indigo : blanc
+  background: "#F6F5F2", // fond des écrans, couleur papier un peu chaude
+  surface: "#FFFFFF", // fond des cartes et des champs
+  surfaceMuted: "#EFEEEA", // fond grisé pour les événements passés
+  text: "#1C1B22", // couleur du texte normal
+  textMuted: "#6B6A75", // texte secondaire, plus discret
+  border: "#E4E2DC", // couleur des bordures
+  danger: "#D93F3F", // rouge pour les erreurs et la suppression
+  dangerSoft: "#FDECEC", // fond rose pâle qui va avec le rouge
+  success: "#1F9D6B", // vert pour "je participe"
+  successSoft: "#E6F6EF", // fond vert pâle qui va avec
 } as const;
 
 // ----- Espacements (marges, paddings, gaps) -----
-// Échelle fixe : on choisit dans cette liste au lieu d'inventer une valeur à chaque fois
+// On prend toujours une valeur de cette liste plutôt que d'inventer un chiffre
 export const spacing = {
-  xxs: 2,
+  xxs: 2, // tout petit écart
   xs: 4,
   sm: 8,
-  ms: 12,
+  ms: 12, // entre sm et md
   md: 16,
   lg: 24,
-  xl: 32,
+  xl: 32, // gros espace
 } as const;
 
 // ----- Arrondis des coins -----
 export const radius = {
-  sm: 6,
-  md: 12,
-  lg: 16,
-  pill: 999, // Valeur très grande : bords complètement arrondis (pilule, cercle)
+  sm: 6, // léger arrondi
+  md: 12, // arrondi des boutons et champs
+  lg: 16, // arrondi des cartes
+  pill: 999, // valeur énorme = bords complètement ronds (pilule ou cercle)
 } as const;
 
-// ----- Typographie -----
+// ----- Tailles de texte -----
 export const fontSize = {
-  xxs: 10,
-  xs: 11,
-  sm: 13,
-  md: 16,
-  lg: 20,
-  xl: 26,
-  xxl: 32,
+  xxs: 10, // minuscule (mini bloc date)
+  xs: 11, // petits libellés
+  sm: 13, // texte secondaire
+  md: 16, // texte normal
+  lg: 20, // titres de header
+  xl: 26, // gros titres
+  xxl: 32, // énorme (numéro du jour sur le détail)
 } as const;
 
-// Hauteur d'une ligne de texte, associée aux tailles ci-dessus (plus lisible sur les textes longs)
+// Hauteur d'une ligne de texte, ça aère les textes longs
 export const lineHeight = {
-  sm: 20,
-  md: 24,
-  xl: 32,
-  xxl: 40,
+  sm: 20, // pour du texte en fontSize.sm
+  md: 24, // pour du texte en fontSize.md
+  xl: 32, // pour du texte en fontSize.xl
+  xxl: 40, // pour du texte en fontSize.xxl
 } as const;
 
-// Graisses de police : React Native attend une chaîne ("600"), pas un nombre
+// Épaisseur du texte : React Native veut une chaîne ("600"), pas un nombre
 export const fontWeight = {
-  semibold: "600",
-  bold: "700",
-  heavy: "800",
+  semibold: "600", // un peu gras
+  bold: "700", // gras
+  heavy: "800", // très gras
 } as const;
 
-// Espacement entre les lettres, pour les petits titres en majuscules
+// Espace entre les lettres, pour les petits titres en majuscules
 export const letterSpacing = {
   sm: 0.5,
   md: 0.8,
@@ -74,24 +74,24 @@ export const letterSpacing = {
 
 // ----- Bordures -----
 export const borderWidth = {
-  thin: 1, // Contour des cartes et des champs
-  thick: 4, // Anneau autour de l'avatar
+  thin: 1, // contour des cartes et des champs
+  thick: 4, // l'anneau autour de l'avatar
 } as const;
 
-// ----- Dimensions fixes de certains éléments -----
+// ----- Tailles fixes de certains éléments -----
 export const sizes = {
-  dateBlockSm: 48, // Mini bloc date du sélecteur de date
-  dateBlockMd: 68, // Bloc date des cartes de la liste
-  dateBlockLg: 84, // Bloc date de l'écran de détail
-  avatar: 88,
-  authIcon: 72, // Icône calendrier des écrans de connexion / inscription
-  authIconBand: 20, // Bande colorée en haut de cette icône
-  authIconRing: 6, // « Anneaux » de reliure de cette icône
-  textAreaMinHeight: 120, // Hauteur minimale du champ description
+  dateBlockSm: 48, // mini bloc date dans le sélecteur de date
+  dateBlockMd: 68, // bloc date des cartes de la liste
+  dateBlockLg: 84, // bloc date de l'écran de détail
+  avatar: 88, // rond avec les initiales sur le profil
+  authIcon: 72, // icône calendrier sur connexion / inscription
+  authIconBand: 20, // bande indigo en haut de cette icône
+  authIconRing: 6, // les petits ronds (anneaux) de cette icône
+  textAreaMinHeight: 120, // hauteur mini du champ description
 } as const;
 
-// ----- Opacités des états d'interaction (bouton appuyé, désactivé) -----
+// ----- Transparence quand on appuie ou que c'est désactivé -----
 export const opacity = {
-  pressed: 0.8,
-  disabled: 0.5,
+  pressed: 0.8, // bouton qu'on est en train d'appuyer
+  disabled: 0.5, // bouton désactivé
 } as const;

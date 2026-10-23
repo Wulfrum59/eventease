@@ -1,73 +1,75 @@
-// Bouton de l'app, en deux variantes : "primary" (action principale) et "danger" (action destructive).
-import { Pressable, StyleSheet, Text } from "react-native";
+// Le bouton de l'app, en deux versions : "primary" (action normale) et "danger" (supprimer, annuler...)
+import { Pressable, StyleSheet, Text } from "react-native"; // Pressable = zone qui réagit au doigt
 
-import { colors, fontSize, fontWeight, opacity, radius, spacing } from "@/constants/theme";
+import { colors, fontSize, fontWeight, opacity, radius, spacing } from "@/constants/theme"; // valeurs du thème
 
+// Les props que le bouton accepte
 type ButtonProps = {
-  title: string;
-  onPress: () => void;
-  variant?: "primary" | "danger"; // Union de chaînes : seules ces deux valeurs sont acceptées
-  disabled?: boolean;
+  title: string; // texte du bouton
+  onPress: () => void; // ce qui se passe quand on appuie
+  variant?: "primary" | "danger"; // seulement ces deux valeurs possibles, et c'est optionnel
+  disabled?: boolean; // désactivé ou pas, optionnel aussi
 };
 
 export function Button({
   title,
   onPress,
-  variant = "primary", // Valeur par défaut si le parent ne passe pas la prop
-  disabled = false,
+  variant = "primary", // si le parent ne dit rien, c'est un bouton normal
+  disabled = false, // et il est actif
 }: ButtonProps) {
-  const isDanger = variant === "danger";
+  const isDanger = variant === "danger"; // raccourci pour savoir si c'est un bouton rouge
 
   return (
     <Pressable
-      onPress={onPress}
-      disabled={disabled} // Pressable ignore les appuis quand disabled vaut true
-      accessibilityRole="button" // Annoncé comme « bouton » par le lecteur d'écran
-      accessibilityState={{ disabled }}
-      // style reçoit une fonction : React Native l'appelle avec l'état d'appui
+      onPress={onPress} // on déclenche l'action du parent
+      disabled={disabled} // quand c'est true, Pressable ignore les appuis
+      accessibilityRole="button" // le lecteur d'écran annonce "bouton"
+      accessibilityState={{ disabled }} // et il dit aussi s'il est désactivé
+      // style peut être une fonction : React Native nous dit si on est en train d'appuyer
       style={({ pressed }) => [
-        styles.base,
-        isDanger ? styles.danger : styles.primary,
-        pressed && styles.pressed, // false est ignoré : le style ne s'applique que si pressed
-        disabled && styles.disabled, // En dernier : prioritaire sur les styles précédents
+        styles.base, // le style commun
+        isDanger ? styles.danger : styles.primary, // fond rose ou indigo
+        pressed && styles.pressed, // si pressed est false, React Native l'ignore
+        disabled && styles.disabled, // en dernier pour passer devant les autres
       ]}
     >
+      {/* Le texte du bouton, rouge ou blanc selon la version */}
       <Text style={[styles.title, isDanger ? styles.dangerTitle : styles.primaryTitle]}>{title}</Text>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  // ----- Fond du bouton -----
+  // ----- Le fond du bouton -----
   base: {
-    paddingVertical: spacing.ms,
-    paddingHorizontal: spacing.lg,
-    borderRadius: radius.md,
-    alignItems: "center", // Centre le texte horizontalement
+    paddingVertical: spacing.ms, // espace en haut et en bas
+    paddingHorizontal: spacing.lg, // espace à gauche et à droite
+    borderRadius: radius.md, // coins arrondis
+    alignItems: "center", // texte centré horizontalement
   },
   primary: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primary, // fond indigo
   },
-  // Danger en version « douce » : fond rosé et texte rouge, moins agressif qu'un aplat rouge
+  // Danger en version douce : fond rosé et texte rouge, moins agressif qu'un gros bloc rouge
   danger: {
-    backgroundColor: colors.dangerSoft,
+    backgroundColor: colors.dangerSoft, // fond rose pâle
   },
   pressed: {
-    opacity: opacity.pressed,
+    opacity: opacity.pressed, // un peu transparent pendant l'appui
   },
   disabled: {
-    opacity: opacity.disabled,
+    opacity: opacity.disabled, // à moitié transparent quand désactivé
   },
 
-  // ----- Texte du bouton -----
+  // ----- Le texte du bouton -----
   title: {
-    fontSize: fontSize.md,
-    fontWeight: fontWeight.semibold,
+    fontSize: fontSize.md, // taille normale
+    fontWeight: fontWeight.semibold, // un peu gras
   },
   primaryTitle: {
-    color: colors.onPrimary,
+    color: colors.onPrimary, // blanc sur l'indigo
   },
   dangerTitle: {
-    color: colors.danger,
+    color: colors.danger, // rouge sur le rose
   },
 });

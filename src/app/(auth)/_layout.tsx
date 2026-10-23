@@ -1,22 +1,23 @@
-import { Stack } from "expo-router";
+import { Stack } from "expo-router"; // navigation en pile
 
-import { colors, fontSize, fontWeight } from "@/constants/theme";
+import { colors, fontSize, fontWeight } from "@/constants/theme"; // thème
 
-// Navigation entre les écrans de connexion et d'inscription
+// La navigation entre la connexion et l'inscription
 export default function AuthLayout() {
   return (
     <Stack
       screenOptions={{
-        // Même rendu de header que le reste de l'app
-        headerStyle: { backgroundColor: colors.background },
-        headerShadowVisible: false,
-        headerTintColor: colors.primary, // Couleur de la flèche retour
-        headerTitleStyle: { fontSize: fontSize.lg, fontWeight: fontWeight.bold, color: colors.text },
-        contentStyle: { backgroundColor: colors.background },
+        // Même look de header que dans le reste de l'app
+        headerStyle: { backgroundColor: colors.background }, // fond du header
+        headerShadowVisible: false, // pas d'ombre
+        headerTintColor: colors.primary, // couleur de la flèche retour
+        headerTitleStyle: { fontSize: fontSize.lg, fontWeight: fontWeight.bold, color: colors.text }, // le titre
+        contentStyle: { backgroundColor: colors.background }, // fond derrière les écrans
       }}
     >
-      {/* Pas de header sur la connexion : l'écran a déjà son propre en-tête (et pas de retour possible) */}
+      {/* Pas de header sur la connexion : l'écran a déjà son en-tête, et il n'y a pas de retour possible */}
       <Stack.Screen name="login" options={{ title: "Connexion", headerShown: false }} />
+      {/* Sur l'inscription on garde le header pour la flèche retour */}
       <Stack.Screen name="register" options={{ title: "Inscription" }} />
     </Stack>
   );
